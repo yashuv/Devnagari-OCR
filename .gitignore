@@ -1,0 +1,12 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+
+/Web UI/static/uploads/
+ocr-image-segmentation-using-numpy.ipynb
+
+# Android Studio will place build artifacts here
+/android/app/debug
+
+

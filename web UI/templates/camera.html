@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera Capture</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #camera-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #camera-video {
+            border: 1px solid #000;
+            max-width: 100%;
+            height: auto;
+        }
+
+#camera-canvas {
+    display: block;
+    position: absolute;
+    top: 10%;
+    left: 10%;
+}
+
+
+        #buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            margin: 0 10px;
+        }
+
+        #image-form {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #prediction {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Camera Capture</h2>
+    <div id="camera-container">
+        <video id="camera-video" width="300" height="300"></video>
+        <canvas id="camera-canvas" width="300" height="300"></canvas>
+    </div>
+    <div id="buttons">
+        <button id="open-button" onclick="openCamera()" class="btn btn-info">Open Camera</button>
+        <button id="capture-button" onclick="captureImage()" disabled class="btn btn-default">Capture</button>
+        <button id="predict-button" onclick="submitForm()" disabled class="btn btn-success">Predict</button>
+    </div>
+
+    <form id="image-form" method="post" enctype="multipart/form-data" style="display: none;">
+        <input id="image-input" type="file" accept="image/*" capture="environment">
+        <input id="image-data" type="hidden" name="image_data">
+    </form>
+
+    <div id="prediction">
+        <h2>Prediction:</h2>
+        <h3>{{ pred }}</h3>
+    </div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jq.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script>
+        let videoElement = document.getElementById('camera-video');
+        let canvasElement = document.getElementById('camera-canvas');
+        let captureButton = document.getElementById('capture-button');
+        let predictButton = document.getElementById('predict-button');
+        let capturedImage = null;
+
+        // Open camera and start the video stream
+        function openCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    videoElement.srcObject = stream;
+                    videoElement.play();
+                    captureButton.disabled = false;
+                })
+                .catch(function (error) {
+                    console.error('Error accessing camera:', error);
+                });
+        }
+
+        // Capture image from the video stream and display in canvas
+// Capture image from the video stream and display in canvas
+// Capture image from the video stream and display in canvas
+function captureImage() {
+    const context = canvasElement.getContext('2d');
+    context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+    // Stop the video stream
+    videoElement.srcObject.getTracks().forEach(function (track) {
+        track.stop();
+    });
+
+    // Disable the capture button
+    captureButton.disabled = true;
+
+    // Save the captured image
+    const image = canvasElement.toDataURL('image/jpeg');
+    document.getElementById('image-data').value = image;
+
+    // Enable the predict button
+    predictButton.disabled = false;
+
+    // Clear the canvas
+    context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+    // Draw the captured image on the canvas after it loads
+    capturedImage = new Image();
+    capturedImage.onload = function () {
+        context.drawImage(capturedImage, 0, 0, canvasElement.width, canvasElement.height);
+    };
+    capturedImage.src = image;
+}
+
+
+        // Submit the form for prediction
+        function submitForm() {
+            document.getElementById('image-form').submit();
+        }
+
+        // Restore the camera view
+        function restoreCameraView() {
+            capturedImage = null;
+            captureButton.disabled = false;
+            predictButton.disabled = true;
+            canvasElement.getContext('2d').clearRect(0, 0, canvasElement.width, canvasElement.height);
+            openCamera();
+        }
+
+        // Event listener for the space bar keydown event
+        window.addEventListener('keydown', function (event) {
+            if (event.keyCode === 32) { // space bar key code
+                captureImage();
+            }
+        });
+    </script>
+</body>
+</html>

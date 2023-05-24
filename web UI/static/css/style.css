@@ -1,0 +1,29 @@
+
+
+footer
+{
+	background-color: #A9A9A9;
+	color: white;
+	font-style: italic;
+	font-size: 14px;
+	padding: 25px;
+	width: 100%;
+	text-align: center;
+	margin-bottom: 0;
+}
+
+#header
+{
+	background-color: lightblue;
+}
+
+#headertext
+{
+	color: white;
+}
+
+#imgcnt
+{
+	width: 50px;
+	height: 40px;
+}
